@@ -16,7 +16,7 @@ class Db {
             }
         });
 
-        var result = [];
+        let result = [];
         if (params === undefined || params === null || !params) {
             this.connection.each(queryString, (err, row) => {
                 if (err) {
@@ -50,6 +50,34 @@ class Db {
         });
     }
 
+    insert(queryString, params, callback) {
+        this.connection = new sqlite3.Database(this.dbName, sqlite3.OPEN_READWRITE, (err) => {
+            if (err) {
+                console.error('insert get conn: ' + err.message);
+                callback(err);
+            }
+        });
+
+        let result = '';
+        this.connection.run(queryString, params, (err) => {
+            if (err) {
+                callback(err);
+            }
+            else {
+                result = `Row inserted ${this.lastID}`;
+            }
+        });
+
+        this.connection.close((err) => {
+            if (err) {
+                console.error(err.message);
+                callback(err);
+            }
+            console.log('Close the database connection.');
+            callback(null, result);
+        });
+    }
+
     delete(queryString, params, callback) {
         this.connection = new sqlite3.Database(this.dbName, sqlite3.OPEN_READWRITE, (err) => {
             if (err) {
@@ -58,12 +86,13 @@ class Db {
             }
         });
 
+        let result = '';
         this.connection.run(queryString, params, (err) => {
             if (err) {
                 callback(err);
             }
             else {
-                callback(null, `Row(s) deleted ${this.changes}`);
+                result = `Row(s) deleted ${this.changes}`;
             }
         });
 
