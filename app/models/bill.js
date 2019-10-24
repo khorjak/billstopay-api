@@ -26,13 +26,8 @@ class Bill {
         getBills(id, callback);
     }
 
-    save(callback) {
-        try {
-        
-        } catch (err) {
-            console.log(err.message);
-            callback(err);
-        }
+    delete(id, callback) {
+        deleteBill(id, callback);
     }
 };
 
@@ -60,7 +55,7 @@ function getBills(id, callback) {
         });
     }
     else {
-        db.query('SELECT * FROM bills WHERE id=?;', [id], (err, row) => {
+        db.query(`SELECT * FROM bills WHERE id=?;`, [id], (err, row) => {
             if (err) {
                 console.error(err.message);
                 callback(err);
@@ -72,6 +67,20 @@ function getBills(id, callback) {
             callback(null, row);
         });
     }
+}
+
+function deleteBill(id, callback) {
+    if (!id) {
+        callback(err);
+    }
+    var db = new Db();
+    db.delete(`DELETE FROM bills WHERE id=?`, [id], (err, result) => {
+        if (err) {
+            console.error(err.message);
+            callback(err);
+        }
+        callback(null, result);
+    });
 }
 
 module.exports = Bill;
